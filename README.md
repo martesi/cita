@@ -83,6 +83,12 @@ The earlier no-storage format remains supported:
 
 For larger LLM-generated content, prefer `create_reference` so the citation URL stays short.
 
+## GitHub Pages
+
+GitHub Pages remains available as a static-only deployment option. Enable Pages with **GitHub Actions** as the source, then run the `Deploy Pages` workflow manually.
+
+Pages publishes `site/` directly and supports the URL-embedded `q=` / `algo=gzip` references and the browser UI. Stored `/r/<id>` references and `/mcp` require the Cloudflare Worker deployment.
+
 ## Access
 
 The default template exposes `create_reference` publicly so a newly deployed MCP endpoint works without a second identity-provider setup. Put the Worker behind Cloudflare Access or another OAuth layer before using it where anonymous writes are unacceptable.
