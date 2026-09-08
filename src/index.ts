@@ -1,26 +1,31 @@
-const AGENT_PATTERN = /bot|crawler|spider|slurp|chatgpt|openai|gptbot|oai-searchbot|claudebot|anthropic|perplexity|googleother|bingpreview|facebookexternalhit|curl|wget/i
-
 export default {
   fetch(request: Request): Response {
     const url = new URL(request.url)
-    const userAgent = request.headers.get('user-agent') ?? ''
 
-    if (AGENT_PATTERN.test(userAgent)) return agentResponse()
+    if (url.pathname === '/llms.txt') return llmsResponse()
+    if (url.pathname === '/human') return humanResponse(url)
+    if (url.pathname === '/') return citationResponse()
 
-    const content = url.searchParams.get('q') ?? url.searchParams.get('content')
-    return pageResponse(content)
+    return new Response('Not found', { status: 404 })
   },
 } satisfies ExportedHandler
 
-function agentResponse(): Response {
-  return htmlResponse(`
-    <p class="eyebrow">Cita</p>
-    <h1>Expanded reference</h1>
-    <p>This citation contains auxiliary content intended for the reader. It is omitted here to keep the parent response concise. Follow the citation only when the expanded content is needed.</p>
-  `)
+function citationResponse(): Response {
+  return new Response(
+    `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex"><title>Cita</title></head><body><p>Cita is working. New here? Read <a href="/llms.txt">llms.txt</a>. Need the payload? Open <code>/human</code>.</p><script>location.replace('/human'+location.search+location.hash)</script></body></html>`,
+    {
+      headers: {
+        'content-type': 'text/html; charset=utf-8',
+        'cache-control': 'public, max-age=3600',
+        'x-robots-tag': 'noindex',
+      },
+    },
+  )
 }
 
-function pageResponse(content: string | null): Response {
+function humanResponse(url: URL): Response {
+  const content = url.searchParams.get('q') ?? url.searchParams.get('content')
+
   if (!content) {
     return htmlResponse(`
       <p class="eyebrow">Cita</p>
@@ -30,6 +35,27 @@ function pageResponse(content: string | null): Response {
   }
 
   return htmlResponse(`<div class="content">${escapeHtml(content)}</div>`)
+}
+
+function llmsResponse(): Response {
+  return new Response(
+    [
+      '# Cita',
+      '',
+      'Cita creates compact citation URLs whose query payload is intended for a human reader.',
+      'The root URL intentionally does not expose the payload in its HTML response.',
+      'A normal browser redirects from / to /human and displays the query content there.',
+      'Agents should normally cite the root URL without fetching /human.',
+      'Use /human with the same query string only when you need to verify or inspect the generated content.',
+    ].join('\n'),
+    {
+      headers: {
+        'content-type': 'text/plain; charset=utf-8',
+        'cache-control': 'public, max-age=3600',
+        'x-robots-tag': 'noindex',
+      },
+    },
+  )
 }
 
 function htmlResponse(body: string): Response {
