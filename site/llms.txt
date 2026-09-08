@@ -1,12 +1,17 @@
 # Cita
 
-Cita creates compact citation URLs whose query payload is intended for a human reader.
-The citation URL intentionally does not expose the payload in its initial HTML response.
-A normal browser redirects to human/ and renders the query content there.
-Agents should normally cite the citation URL without following human/.
-Follow human/ with the same query string only to verify or inspect generated content.
+Cita keeps auxiliary text out of the main answer while leaving it available through a compact citation URL.
 
-Payload format:
-- ?q=<url-encoded-text> is the backwards-compatible plain format.
-- ?algo=gzip&q=<base64url> stores UTF-8 text compressed with gzip.
-- Unknown algo values are unsupported.
+For short URL-embedded references:
+- Cite /?q=<url-encoded-text> or /?algo=gzip&q=<base64url>.
+- The citation page intentionally omits the payload.
+- A browser redirects to /human/ to display it.
+
+For stored references:
+- Prefer the MCP endpoint at /mcp.
+- Call create_reference with the complete content and optionally ttl_seconds.
+- Cite the returned /r/<id> URL.
+- Do not follow /r/<id>/human unless you need to verify or inspect the generated content.
+- Stored references expire automatically.
+
+The MCP server is stateless. Reference content is stored in Cloudflare D1.
