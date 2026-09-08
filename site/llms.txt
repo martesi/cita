@@ -4,4 +4,9 @@ Cita creates compact citation URLs whose query payload is intended for a human r
 The citation URL intentionally does not expose the payload in its initial HTML response.
 A normal browser redirects to human/ and renders the query content there.
 Agents should normally cite the citation URL without following human/.
-Follow human/ with the same query string only to verify or inspect the generated content.
+Follow human/ with the same query string only to verify or inspect generated content.
+
+Payload format:
+- ?q=<url-encoded-text> is the backwards-compatible plain format.
+- ?algo=gzip&q=<base64url> stores UTF-8 text compressed with gzip.
+- Unknown algo values are unsupported.

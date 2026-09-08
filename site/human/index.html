@@ -4,38 +4,50 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />
+    <meta name="description" content="Read or create a compact Cita reference." />
     <title>Cita</title>
-    <style>
-      :root {
-        color-scheme: light dark;
-        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-          "Segoe UI", sans-serif;
-        line-height: 1.6;
-      }
-      body {
-        margin: 0;
-        min-height: 100vh;
-        background: Canvas;
-        color: CanvasText;
-      }
-      main {
-        width: min(44rem, calc(100% - 2rem));
-        margin: 0 auto;
-        padding: 12vh 0 4rem;
-      }
-      #content {
-        white-space: pre-wrap;
-        overflow-wrap: anywhere;
-        font-size: 1.05rem;
-      }
-    </style>
+    <link rel="stylesheet" href="../style.css" />
   </head>
   <body>
-    <main><article id="content"></article></main>
-    <script>
-      const params = new URLSearchParams(location.search)
-      const content = params.get('q') ?? params.get('content') ?? ''
-      document.querySelector('#content').textContent = content || 'Nothing to display.'
-    </script>
+    <main>
+      <header>
+        <a class="brand" href="../">cita</a>
+        <span class="muted">compact references</span>
+      </header>
+
+      <section class="panel" id="reader" hidden>
+        <div class="toolbar">
+          <span id="meta"></span>
+          <button id="copy-text" type="button">Copy text</button>
+          <button id="copy-link" type="button">Copy citation</button>
+          <button id="edit" type="button">Edit</button>
+          <button id="new" type="button">New</button>
+        </div>
+        <article id="content"></article>
+      </section>
+
+      <section class="panel editor" id="editor" hidden>
+        <textarea
+          id="input"
+          aria-label="Reference content"
+          placeholder="Paste the content you want to keep out of the main answer…"
+        ></textarea>
+        <div class="editor-actions">
+          <label>
+            <span class="muted">Encoding</span>
+            <select id="algo">
+              <option value="auto" selected>Auto</option>
+              <option value="plain">Plain URL</option>
+              <option value="gzip">Gzip</option>
+            </select>
+          </label>
+          <button class="primary" id="generate" type="button">Generate citation</button>
+        </div>
+        <span class="muted">⌘/Ctrl + Enter to generate</span>
+      </section>
+
+      <p id="status" role="status" aria-live="polite"></p>
+    </main>
+    <script type="module" src="../app.js"></script>
   </body>
 </html>
