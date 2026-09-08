@@ -12,7 +12,7 @@ export default {
 
 function citationResponse(): Response {
   return new Response(
-    `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex"><title>Cita</title></head><body><p>Cita is working. New here? Read <a href="/llms.txt">llms.txt</a>. Need the payload? Open <code>/human</code>.</p><script>location.replace('/human'+location.search+location.hash)</script></body></html>`,
+    `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex"><title>Cita</title></head><body><p>Cita is working. New here? Read <a href="/llms.txt">llms.txt</a>. Need the payload? Open <code>/human</code>.</p><script>location.replace(location.pathname.replace(/\/?$/, '/human')+location.search+location.hash)</script></body></html>`,
     {
       headers: {
         'content-type': 'text/html; charset=utf-8',
