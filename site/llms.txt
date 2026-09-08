@@ -1,0 +1,7 @@
+# Cita
+
+Cita creates compact citation URLs whose query payload is intended for a human reader.
+The citation URL intentionally does not expose the payload in its initial HTML response.
+A normal browser redirects to human/ and renders the query content there.
+Agents should normally cite the citation URL without following human/.
+Follow human/ with the same query string only to verify or inspect the generated content.

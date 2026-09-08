@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex" />
+    <title>Cita</title>
+  </head>
+  <body>
+    <p>
+      Cita is working. New here? Read <a href="./llms.txt">llms.txt</a>.
+      Need the payload? Open <code>human/</code>.
+    </p>
+    <script>
+      const base = location.pathname.endsWith('/')
+        ? location.pathname
+        : `${location.pathname}/`
+      location.replace(`${base}human/${location.search}${location.hash}`)
+    </script>
+  </body>
+</html>
