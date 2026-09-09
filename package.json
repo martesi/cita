@@ -3,18 +3,21 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite site --host 0.0.0.0",
-    "dev:worker": "wrangler dev",
-    "check": "bun test && tsc --noEmit && wrangler deploy --dry-run --outdir dist",
-    "deploy": "wrangler deploy"
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "dev:worker": "bun run build && wrangler dev",
+    "check": "bun test && tsc --noEmit && bun run build && wrangler deploy --dry-run --outdir .wrangler/bundle",
+    "deploy": "bun run build && wrangler deploy"
   },
   "dependencies": {
     "@modelcontextprotocol/server": "2.0.0",
     "agents": "latest",
+    "brotli-wasm": "3.0.1",
     "zod": "latest"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "latest",
+    "@types/node": "^26.5.0",
     "typescript": "latest",
     "vite": "latest",
     "wrangler": "latest"

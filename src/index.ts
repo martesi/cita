@@ -1,6 +1,9 @@
 import { McpServer } from '@modelcontextprotocol/server'
 import { createMcpHandler } from 'agents/mcp/server'
+import { brotliCompressSync, constants } from 'node:zlib'
 import { z } from 'zod'
+
+const BROTLI_AUTO_THRESHOLD = 2048
 
 interface Env {
   ASSETS: Fetcher
@@ -25,7 +28,7 @@ function createMcpServer(origin: string): McpServer {
     'create_reference',
     {
       description:
-        'Convert auxiliary text into a self-contained Cita citation URL. The tool automatically uses plain URL encoding or gzip compression, whichever produces the shorter URL.',
+        'Convert auxiliary text into a self-contained Cita citation URL. The tool automatically chooses plain URL encoding, gzip, or Brotli based on the resulting URL length.',
       inputSchema: {
         content: z
           .string()
@@ -43,15 +46,33 @@ function createMcpServer(origin: string): McpServer {
 
 export async function createReferenceUrl(origin: string, content: string): Promise<string> {
   const plain = new URLSearchParams({ q: content })
-  const compressed = new URLSearchParams({
+  const gzipParams = new URLSearchParams({
     algo: 'gzip',
     q: bytesToBase64Url(await gzip(content)),
   })
-  const params = compressed.toString().length < plain.toString().length
-    ? compressed
-    : plain
+  let params = shorter(plain, gzipParams)
+
+  if (params.toString().length >= BROTLI_AUTO_THRESHOLD) {
+    const brotliParams = new URLSearchParams({
+      algo: 'br',
+      q: bytesToBase64Url(brotli(content)),
+    })
+    params = shorter(params, brotliParams)
+  }
 
   return `${origin}/?${params}`
+}
+
+function shorter(left: URLSearchParams, right: URLSearchParams): URLSearchParams {
+  return right.toString().length < left.toString().length ? right : left
+}
+
+function brotli(content: string): Uint8Array {
+  return brotliCompressSync(new TextEncoder().encode(content), {
+    params: {
+      [constants.BROTLI_PARAM_QUALITY]: 11,
+    },
+  })
 }
 
 async function gzip(content: string): Promise<Uint8Array> {

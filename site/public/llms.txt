@@ -5,13 +5,14 @@ Cita converts auxiliary text into self-contained citation URLs.
 For URL references:
 - ?q=<url-encoded-text> stores plain text in the URL.
 - ?algo=gzip&q=<base64url> stores UTF-8 text compressed with gzip.
+- ?algo=br&q=<base64url> stores UTF-8 text compressed with Brotli.
 - The citation page intentionally does not render the payload in its initial HTML response.
 - A browser redirects to human/ and decodes the payload there.
 
 For LLM clients:
 - Prefer the MCP endpoint at /mcp when available.
 - Call create_reference with the complete content.
-- The tool automatically returns whichever self-contained form is shorter: plain URL encoding or gzip + Base64URL.
+- The tool uses plain or gzip for smaller links and considers Brotli once the current encoded payload is at least 2 KB, returning the shortest result.
 - No citation content is stored server-side by Cita.
 - Cite the returned URL directly.
 - Do not follow human/ unless you need to verify or inspect the generated content.

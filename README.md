@@ -20,14 +20,15 @@ It provides one tool:
 create_reference(content) -> self-contained citation URL
 ```
 
-The tool automatically compares:
+The tool automatically compares plain URL encoding and gzip, then considers Brotli for larger payloads:
 
 ```text
 /?q=<url-encoded-text>
 /?algo=gzip&q=<base64url>
+/?algo=br&q=<base64url>
 ```
 
-and returns the shorter URL. This lets an LLM create compressed links without needing its own compression or Base64 implementation.
+It returns the shortest result. This lets an LLM create compressed links without needing its own compression or Base64 implementation. Browsers try native Brotli first; the Brotli WASM module is lazy-loaded only when Brotli is actually needed and the native format is unavailable. Ordinary plain/gzip links do not download it.
 
 The resulting URL is self-contained: another Cita deployment using the same static frontend can decode it without access to the MCP server that created it.
 
@@ -68,4 +69,4 @@ bun run deploy
 
 GitHub Pages remains the zero-backend option. Enable Pages with **GitHub Actions** as the source, then run the `Deploy Pages` workflow.
 
-Pages publishes `site/` directly. It supports creating and reading the same self-contained `q=` / `algo=gzip` URLs in the browser, but it does not provide `/mcp`.
+Pages builds `site/` with Vite and publishes `dist/`. It supports creating and reading the same self-contained `q=` / `algo=gzip` / `algo=br` URLs in the browser, but it does not provide `/mcp`.
