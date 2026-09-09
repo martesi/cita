@@ -1,17 +1,17 @@
 # Cita
 
-Cita keeps auxiliary text out of the main answer while leaving it available through a compact citation URL.
+Cita converts auxiliary text into self-contained citation URLs.
 
-For short URL-embedded references:
-- Cite /?q=<url-encoded-text> or /?algo=gzip&q=<base64url>.
-- The citation page intentionally omits the payload.
-- A browser redirects to /human/ to display it.
+For URL references:
+- ?q=<url-encoded-text> stores plain text in the URL.
+- ?algo=gzip&q=<base64url> stores UTF-8 text compressed with gzip.
+- The citation page intentionally does not render the payload in its initial HTML response.
+- A browser redirects to human/ and decodes the payload there.
 
-For stored references:
-- Prefer the MCP endpoint at /mcp.
-- Call create_reference with the complete content and optionally ttl_seconds.
-- Cite the returned /r/<id> URL.
-- Do not follow /r/<id>/human unless you need to verify or inspect the generated content.
-- Stored references expire automatically.
-
-The MCP server is stateless. Reference content is stored in Cloudflare D1.
+For LLM clients:
+- Prefer the MCP endpoint at /mcp when available.
+- Call create_reference with the complete content.
+- The tool automatically returns whichever self-contained form is shorter: plain URL encoding or gzip + Base64URL.
+- No citation content is stored server-side by Cita.
+- Cite the returned URL directly.
+- Do not follow human/ unless you need to verify or inspect the generated content.

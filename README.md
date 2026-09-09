@@ -1,94 +1,71 @@
 # cita
 
-Compact references for LLM answers.
+Compact, self-contained references for LLM answers.
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/martesi/cita)
 
-The deploy flow clones the repository into your GitHub or GitLab account, asks you to authorize Cloudflare, provisions the required D1 database, applies the included migration, deploys the Worker, and connects future pushes to Workers Builds.
+Cita keeps the referenced text inside the URL itself. Nothing is stored in a database or object store.
 
 ## MCP
 
-Connect an MCP client to:
+A Cloudflare deployment exposes:
 
 ```text
 https://<your-worker>/mcp
 ```
 
-Cita exposes one tool:
+It provides one tool:
 
 ```text
-create_reference(content, ttl_seconds?) -> short citation URL
+create_reference(content) -> self-contained citation URL
 ```
 
-The returned URL looks like:
-
-```text
-https://<your-worker>/r/AbCdEf012345
-```
-
-The citation page is intentionally tiny and does not include the stored content. A browser redirects to `/r/<id>/human`; agents normally do not need to follow that route.
-
-References default to 7 days, accept a maximum TTL of 30 days, and accept up to 256 KiB of UTF-8 text.
-
-## Development
-
-Install dependencies:
-
-```sh
-bun install
-```
-
-Fast UI-only development with Vite HMR:
-
-```sh
-bun run dev
-```
-
-Full Worker + local D1 + MCP development:
-
-```sh
-bun run dev:worker
-```
-
-Wrangler applies the local D1 migration, then watches the Worker and static assets. Local D1 data is isolated from production.
-
-Check the Worker bundle and TypeScript:
-
-```sh
-bun run check
-```
-
-## HTTP API
-
-The MCP tool and HTTP API share the same storage path. This is useful for simple integrations and local testing:
-
-```http
-POST /api/references
-Content-Type: application/json
-
-{
-  "content": "Auxiliary text",
-  "ttl_seconds": 604800
-}
-```
-
-## URL-embedded references
-
-The earlier no-storage format remains supported:
+The tool automatically compares:
 
 ```text
 /?q=<url-encoded-text>
 /?algo=gzip&q=<base64url>
 ```
 
-For larger LLM-generated content, prefer `create_reference` so the citation URL stays short.
+and returns the shorter URL. This lets an LLM create compressed links without needing its own compression or Base64 implementation.
+
+The resulting URL is self-contained: another Cita deployment using the same static frontend can decode it without access to the MCP server that created it.
+
+## How citation pages behave
+
+The initial citation page intentionally does not put the payload into its HTML body, so an agent fetching it only sees a small notice. JavaScript-capable browsers preserve the query and redirect to `human/`, where the content is decoded and displayed.
+
+Because the payload is in the query string, it can still appear in ordinary browser history, proxy/CDN request metadata, or server access logs. Cita removes persistent application storage; it is not an encryption or secrecy mechanism.
+
+## Development
+
+```sh
+bun install
+bun run dev
+```
+
+`bun run dev` serves `site/` with Vite HMR.
+
+For the MCP Worker:
+
+```sh
+bun run dev:worker
+```
+
+Checks:
+
+```sh
+bun run check
+```
+
+Deploy the stateless MCP + static site to Cloudflare:
+
+```sh
+bun run deploy
+```
 
 ## GitHub Pages
 
-GitHub Pages remains available as a static-only deployment option. Enable Pages with **GitHub Actions** as the source, then run the `Deploy Pages` workflow manually.
+GitHub Pages remains the zero-backend option. Enable Pages with **GitHub Actions** as the source, then run the `Deploy Pages` workflow.
 
-Pages publishes `site/` directly and supports the URL-embedded `q=` / `algo=gzip` references and the browser UI. Stored `/r/<id>` references and `/mcp` require the Cloudflare Worker deployment.
-
-## Access
-
-The default template exposes `create_reference` publicly so a newly deployed MCP endpoint works without a second identity-provider setup. Put the Worker behind Cloudflare Access or another OAuth layer before using it where anonymous writes are unacceptable.
+Pages publishes `site/` directly. It supports creating and reading the same self-contained `q=` / `algo=gzip` URLs in the browser, but it does not provide `/mcp`.
