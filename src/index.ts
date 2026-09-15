@@ -17,22 +17,22 @@ function createMcpServer(origin: string): McpServer {
     {
       description:
         'Convert source URLs into self-contained Cita citation URLs. Each result contains either a citation URL or a reason when that source cannot be converted.',
-      inputSchema: {
+      inputSchema: z.object({
         urls: z.array(z.string()).min(1).describe('Source URLs to convert.'),
         base: z
           .string()
           .url()
           .optional()
           .describe('Cita base URL. Defaults to CITA_BASE_URL from the build environment.'),
-      },
-      outputSchema: {
+      }),
+      outputSchema: z.object({
         results: z.array(
           z.union([
             z.object({ url: z.string() }),
             z.object({ reason: z.string() }),
           ]),
         ),
-      },
+      }),
     },
     async ({ urls, base }) => {
       const result = {

@@ -9,6 +9,7 @@ Cita keeps the referenced text inside the URL itself. Nothing is stored in a dat
 The hosted backend exposes:
 
 ```text
+https://<host>/mcp
 https://<host>/api/mcp
 ```
 
