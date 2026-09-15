@@ -11,8 +11,10 @@ For URL references:
 - Static GitHub Pages deployments decode the payload in JavaScript because a static host cannot render query-dependent HTML.
 
 For LLM clients:
-- Prefer the MCP endpoint at /mcp when available.
-- Call create_reference with the complete content.
+- Prefer the MCP endpoint at /api/mcp when available; /mcp is also supported.
+- Call create_reference with a `urls` array and an optional `base` URL.
+- The response contains a `results` array; each item has either `url` or `reason`.
+- `base` defaults to the build-time `CITA_BASE_URL` value.
 - The tool uses plain or gzip for smaller links and considers Brotli once the current encoded payload is at least 2 KB, returning the shortest result.
 - No citation content is stored server-side by Cita.
 - Cite the returned URL directly.

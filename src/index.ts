@@ -31,22 +31,49 @@ export default {
 
 function createMcpServer(origin: string): McpServer {
   const server = new McpServer({ name: 'cita', version: '0.2.0' })
+  const defaultBase = process.env.CITA_BASE_URL || origin
 
   server.registerTool(
     'create_reference',
     {
       description:
-        'Convert auxiliary text into a self-contained Cita citation URL. The tool automatically chooses plain URL encoding, gzip, or Brotli based on the resulting URL length.',
+        'Convert source URLs into self-contained Cita citation URLs. Each result contains either a citation URL or a reason when that source cannot be converted.',
       inputSchema: {
-        content: z
+        urls: z.array(z.string()).min(1).describe('Source URLs to convert.'),
+        base: z
           .string()
-          .min(1)
-          .describe('The complete text to embed in the citation URL.'),
+          .url()
+          .optional()
+          .describe('Cita base URL. Defaults to CITA_BASE_URL from the build environment.'),
+      },
+      outputSchema: {
+        results: z.array(
+          z.union([
+            z.object({ url: z.string() }),
+            z.object({ reason: z.string() }),
+          ]),
+        ),
       },
     },
-    async ({ content }) => ({
-      content: [{ type: 'text', text: await createReferenceUrl(origin, content) }],
-    }),
+    async ({ urls, base }) => {
+      const result = {
+        results: await Promise.all(
+          urls.map(async (source) => {
+            try {
+              const sourceUrl = new URL(source)
+              return { url: await createReferenceUrl(base || defaultBase, sourceUrl.toString()) }
+            } catch (error) {
+              return { reason: error instanceof Error ? error.message : 'Invalid URL' }
+            }
+          }),
+        ),
+      }
+
+      return {
+        content: [{ type: 'text', text: JSON.stringify(result) }],
+        structuredContent: result,
+      }
+    },
   )
 
   return server
@@ -68,7 +95,7 @@ export async function createReferenceUrl(origin: string, content: string): Promi
     params = shorter(params, brotliParams)
   }
 
-  return `${origin}/?${params}`
+  return `${origin.replace(/\/+$/, '')}/?${params}`
 }
 
 function shorter(left: URLSearchParams, right: URLSearchParams): URLSearchParams {

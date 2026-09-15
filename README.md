@@ -12,13 +12,16 @@ A Cloudflare deployment exposes:
 
 ```text
 https://<your-worker>/mcp
+https://<your-worker>/api/mcp
 ```
 
 It provides one tool:
 
 ```text
-create_reference(content) -> self-contained citation URL
+create_reference(urls, base?) -> results[]
 ```
+
+Each result contains either `url` or `reason`. `base` overrides the build-time `CITA_BASE_URL` value; local requests fall back to the request origin.
 
 The tool automatically compares plain URL encoding and gzip, then considers Brotli for larger payloads:
 
