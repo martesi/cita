@@ -1,33 +1,12 @@
-import { McpServer } from '@modelcontextprotocol/server'
-import { createMcpHandler } from 'agents/mcp/server'
+import { createMcpHandler, McpServer } from '@modelcontextprotocol/server'
 import { brotliCompressSync, constants } from 'node:zlib'
 import { z } from 'zod'
 
 const BROTLI_AUTO_THRESHOLD = 2048
 
-interface Env {
-  ASSETS: Fetcher
-}
-
-export default {
-  async fetch(request, env, ctx) {
-    const url = new URL(request.url)
-
-    if (url.pathname === '/api/mcp') {
-      return createMcpHandler(
-        () => createMcpServer(url.origin),
-        { route: url.pathname },
-      )(request, env, ctx)
-    }
-
-    if (url.pathname === '/human' || url.pathname === '/human/') {
-      url.pathname = '/'
-      return Response.redirect(url.toString(), 308)
-    }
-
-    return env.ASSETS.fetch(request)
-  },
-} satisfies ExportedHandler<Env>
+export default createMcpHandler(({ requestInfo }) =>
+  createMcpServer(requestInfo ? new URL(requestInfo.url).origin : ''),
+)
 
 function createMcpServer(origin: string): McpServer {
   const server = new McpServer({ name: 'cita', version: '0.2.0' })

@@ -9,15 +9,12 @@
   },
   "dependencies": {
     "@modelcontextprotocol/server": "2.0.0",
-    "agents": "latest",
     "brotli-wasm": "3.0.1",
     "zod": "latest"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "latest",
     "@types/node": "^26.5.0",
     "typescript": "latest",
-    "vite": "latest",
-    "wrangler": "latest"
+    "vite": "latest"
   }
 }
