@@ -2,7 +2,7 @@ export default {
   root: 'site',
   base: './',
   build: {
-    outDir: '../dist',
+    outDir: '../dist/client',
     emptyOutDir: true,
   },
 }
