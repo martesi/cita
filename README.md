@@ -11,7 +11,6 @@ Cita keeps the referenced text inside the URL itself. Nothing is stored in a dat
 A Cloudflare deployment exposes:
 
 ```text
-https://<your-worker>/mcp
 https://<your-worker>/api/mcp
 ```
 
@@ -72,4 +71,4 @@ bun run deploy
 
 GitHub Pages remains the zero-backend option. Enable Pages with **GitHub Actions** as the source, then run the `Deploy Pages` workflow.
 
-Pages builds `site/` with Vite and publishes `dist/`. It supports creating and reading the same self-contained `q=` / `algo=gzip` / `algo=br` URLs in the browser, but it does not provide `/mcp`.
+Pages builds `site/` with Vite and publishes `dist/`. It supports creating and reading the same self-contained `q=` / `algo=gzip` / `algo=br` URLs in the browser, but it does not provide `/api/mcp`.

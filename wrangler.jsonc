@@ -6,6 +6,6 @@
   "assets": {
     "directory": "./dist/client",
     "binding": "ASSETS",
-    "run_worker_first": ["/", "/human", "/human/*", "/mcp", "/api/mcp"]
+    "run_worker_first": ["/", "/human", "/human/*", "/api/mcp"]
   }
 }

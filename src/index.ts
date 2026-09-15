@@ -13,7 +13,7 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url)
 
-    if (url.pathname === '/mcp' || url.pathname === '/api/mcp') {
+    if (url.pathname === '/api/mcp') {
       return createMcpHandler(
         () => createMcpServer(url.origin),
         { route: url.pathname },
