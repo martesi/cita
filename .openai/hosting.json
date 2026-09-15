@@ -1,3 +1,6 @@
 {
-  "project_id": "appgprj_6aa84b7f7e288191b45e59c5defe27fc"
+  "project_id": "appgprj_6aa84b7f7e288191b45e59c5defe27fc",
+  "capabilities": [
+    "mcp"
+  ]
 }
