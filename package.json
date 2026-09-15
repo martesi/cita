@@ -5,9 +5,7 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
-    "dev:worker": "bun run build && wrangler dev",
-    "check": "bun test && tsc --noEmit && bun run build && wrangler deploy --dry-run --outdir .wrangler/bundle",
-    "deploy": "bun run build && wrangler deploy"
+    "check": "bun test && tsc --noEmit && bun run build"
   },
   "dependencies": {
     "@modelcontextprotocol/server": "2.0.0",

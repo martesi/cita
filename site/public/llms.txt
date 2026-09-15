@@ -7,7 +7,6 @@ For URL references:
 - ?algo=gzip&q=<base64url> stores UTF-8 text compressed with gzip.
 - ?algo=br&q=<base64url> stores UTF-8 text compressed with Brotli.
 - The index page reads and creates references; there is no separate human page.
-- Cloudflare deployments render the current text into the initial HTML response, so reading works without JavaScript.
 - Static GitHub Pages deployments decode the payload in JavaScript because a static host cannot render query-dependent HTML.
 
 For LLM clients:

@@ -2,16 +2,14 @@
 
 Compact, self-contained references for LLM answers.
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/martesi/cita)
-
 Cita keeps the referenced text inside the URL itself. Nothing is stored in a database or object store.
 
 ## MCP
 
-A Cloudflare deployment exposes:
+The hosted backend exposes:
 
 ```text
-https://<your-worker>/api/mcp
+https://<host>/api/mcp
 ```
 
 It provides one tool:
@@ -36,7 +34,7 @@ The resulting URL is self-contained: another Cita deployment using the same stat
 
 ## How citation pages behave
 
-The index page is both the reader and editor. On Cloudflare, the Worker decodes a citation payload and renders the current text into the initial HTML response, so the citation remains readable when JavaScript is unavailable. JavaScript adds editing, copying, and client-side encoding. Static GitHub Pages deployments still require JavaScript to decode query-dependent content because there is no server renderer.
+The index page is both the reader and editor. Static GitHub Pages deployments require JavaScript to decode query-dependent content because there is no server renderer.
 
 Because the payload is in the query string, it can still appear in ordinary browser history, proxy/CDN request metadata, or server access logs. Cita removes persistent application storage; it is not an encryption or secrecy mechanism.
 
@@ -49,22 +47,10 @@ bun run dev
 
 `bun run dev` serves `site/` with Vite HMR.
 
-For the MCP Worker:
-
-```sh
-bun run dev:worker
-```
-
 Checks:
 
 ```sh
 bun run check
-```
-
-Deploy the stateless MCP + static site to Cloudflare:
-
-```sh
-bun run deploy
 ```
 
 ## GitHub Pages
