@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test'
 import { brotliDecompressSync } from 'node:zlib'
 import { decodePayload, encodePayload } from '../site/codec.js'
-import { createReferenceUrl } from './index'
+import { createReferenceUrl, decodeReferenceText } from './index'
 
 async function decode(urlString: string): Promise<string> {
   const url = new URL(urlString)
@@ -37,6 +37,9 @@ test('auto selects plain, gzip, and Brotli as useful', async () => {
   expect(await decode(shortUrl)).toBe(short)
   expect(await decode(mediumUrl)).toBe(medium)
   expect(await decode(largeUrl)).toBe(large)
+  expect(decodeReferenceText(new URL(shortUrl).searchParams)).toBe(short)
+  expect(decodeReferenceText(new URL(mediumUrl).searchParams)).toBe(medium)
+  expect(decodeReferenceText(new URL(largeUrl).searchParams)).toBe(large)
   expect(await decodePayload(new URL(largeUrl).searchParams)).toBe(large)
 
   const browserAuto = await encodePayload(large)

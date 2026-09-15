@@ -34,7 +34,7 @@ The resulting URL is self-contained: another Cita deployment using the same stat
 
 ## How citation pages behave
 
-The initial citation page intentionally does not put the payload into its HTML body, so an agent fetching it only sees a small notice. JavaScript-capable browsers preserve the query and redirect to `human/`, where the content is decoded and displayed.
+The index page is both the reader and editor. On Cloudflare, the Worker decodes a citation payload and renders the current text into the initial HTML response, so the citation remains readable when JavaScript is unavailable. JavaScript adds editing, copying, and client-side encoding. Static GitHub Pages deployments still require JavaScript to decode query-dependent content because there is no server renderer.
 
 Because the payload is in the query string, it can still appear in ordinary browser history, proxy/CDN request metadata, or server access logs. Cita removes persistent application storage; it is not an encryption or secrecy mechanism.
 

@@ -40,7 +40,6 @@ async function init() {
 
 function citationBaseUrl() {
   const url = new URL(location.href)
-  url.pathname = url.pathname.replace(/human\/?$/, '')
   url.search = ''
   url.hash = ''
   return url
@@ -112,9 +111,8 @@ generateButton.addEventListener('click', async () => {
     setStatus('Encoding…')
     const encoded = await encodePayload(text, algoSelect.value)
     const url = citationUrl(encoded.params)
-    const humanUrl = new URL(`human/?${encoded.params}`, citationBaseUrl())
 
-    history.replaceState(null, '', humanUrl)
+    history.replaceState(null, '', url)
     params.delete('q')
     params.delete('content')
     params.delete('algo')
