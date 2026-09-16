@@ -3,6 +3,7 @@ import { brotliCompressSync, constants } from 'node:zlib'
 import { z } from 'zod'
 
 const BROTLI_AUTO_THRESHOLD = 2048
+const MAX_URL_BYTES = 32 * 1024
 
 export default createMcpHandler(({ requestInfo }) =>
   createMcpServer(requestInfo ? new URL(requestInfo.url).origin : ''),
@@ -74,7 +75,12 @@ export async function createReferenceUrl(origin: string, content: string): Promi
     params = shorter(params, brotliParams)
   }
 
-  return `${origin.replace(/\/+$/, '')}/?${params}`
+  const url = `${origin.replace(/\/+$/, '')}/?${params}`
+  if (new TextEncoder().encode(url).byteLength > MAX_URL_BYTES) {
+    throw new Error(`Citation URL exceeds ${MAX_URL_BYTES} bytes`)
+  }
+
+  return url
 }
 
 function shorter(left: URLSearchParams, right: URLSearchParams): URLSearchParams {

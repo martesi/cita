@@ -42,3 +42,11 @@ test('auto selects plain, gzip, and Brotli as useful', async () => {
   const browserAuto = await encodePayload(large)
   expect(browserAuto.algo).toBe('br')
 })
+
+test('rejects citation URLs over 32 KiB', async () => {
+  const oversizedBase = `https://cita.example/${'x'.repeat(32 * 1024)}`
+
+  await expect(createReferenceUrl(oversizedBase, 'x')).rejects.toThrow(
+    'Citation URL exceeds 32768 bytes',
+  )
+})
