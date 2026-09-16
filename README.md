@@ -2,60 +2,55 @@
 
 Compact, self-contained references for LLM answers.
 
-Cita keeps the referenced text inside the URL itself. Nothing is stored in a database or object store.
+Cita keeps referenced text inside the URL itself. Nothing is stored in a database or object store.
 
-## MCP
+## Pages
 
-The hosted backend exposes:
+`/` only renders content from the URL. `/create/` creates Cita URLs.
 
-```text
-https://<host>/mcp
-https://<host>/api/mcp
-```
-
-It provides one tool:
-
-```text
-create_reference(urls, base?) -> results[]
-```
-
-Each result contains either `url` or `reason`. `base` overrides the build-time `CITA_BASE_URL` value; local requests fall back to the request origin.
-
-The tool automatically compares plain URL encoding and gzip, then considers Brotli for larger payloads:
+Rendering defaults to literal text. Add `render=md` to render Markdown; embedded HTML stays disabled.
 
 ```text
 /?q=<url-encoded-text>
 /?algo=gzip&q=<base64url>
 /?algo=br&q=<base64url>
+/?q=<content>&render=md
 ```
 
-It returns the shortest result. This lets an LLM create compressed links without needing its own compression or Base64 implementation. Browsers try native Brotli first; the Brotli WASM module is lazy-loaded only when Brotli is actually needed and the native format is unavailable. Ordinary plain/gzip links do not download it.
+GitHub Pages keeps the same static renderer and creator. Query-dependent decoding and Markdown rendering happen in the browser.
 
-The resulting URL is self-contained: another Cita deployment using the same static frontend can decode it without access to the MCP server that created it.
+## MCP
 
-## How citation pages behave
+The hosted backend exposes `/mcp` and `/api/mcp` and provides:
 
-The index page is both the reader and editor. Static GitHub Pages deployments require JavaScript to decode query-dependent content because there is no server renderer.
+```text
+create_reference(urls, base?, render?) -> results[]
+```
 
-Because the payload is in the query string, it can still appear in ordinary browser history, proxy/CDN request metadata, or server access logs. Cita removes persistent application storage; it is not an encryption or secrecy mechanism.
+Each result contains either `url` or `reason`. `base` overrides `CITA_BASE_URL`; hosted requests fall back to their request origin. `render: "md"` applies `render=md` to every generated URL.
+
+The tool compares plain URL encoding and gzip, then considers Brotli for larger payloads and returns the shortest result. Generated URLs remain self-contained.
+
+## Skill and local CLI
+
+Reusable encoding and MCP logic lives under `skill/`. The hosted MCP imports the same implementation used by the local CLI.
+
+```sh
+bun skill/scripts/cli.ts encode 'content'
+bun skill/scripts/cli.ts encode '# heading' --render md
+bun skill/scripts/cli.ts mcp
+```
+
+`encode` also accepts content on stdin. `--base` or `CITA_BASE_URL` controls the target deployment.
 
 ## Development
 
 ```sh
 bun install
 bun run dev
-```
-
-`bun run dev` serves `site/` with Vite HMR.
-
-Checks:
-
-```sh
 bun run check
 ```
 
-## GitHub Pages
+`bun run build` emits the static frontend under `dist/client` and the bundled MCP server entry under `dist/server`.
 
-GitHub Pages remains the zero-backend option. Enable Pages with **GitHub Actions** as the source, then run the `Deploy Pages` workflow.
-
-Pages builds `site/` with Vite and publishes `dist/`. It supports creating and reading the same self-contained `q=` / `algo=gzip` / `algo=br` URLs in the browser, but it does not provide `/api/mcp`.
+Because payloads live in query strings, they can appear in browser history, proxy/CDN request metadata, or server access logs. Cita removes persistent application storage; it is not encryption.

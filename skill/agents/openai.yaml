@@ -1,0 +1,3 @@
+interface:
+  display_name: "Cita"
+  short_description: "Create compact self-contained Cita reference links"

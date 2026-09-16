@@ -9,5 +9,5 @@
     "noEmit": true,
     "types": ["node"]
   },
-  "include": ["src/index.ts"]
+  "include": ["src/index.ts", "skill/scripts/core.ts", "skill/scripts/mcp.ts"]
 }

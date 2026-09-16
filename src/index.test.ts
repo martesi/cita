@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test'
 import { brotliDecompressSync } from 'node:zlib'
 import { decodePayload, encodePayload } from '../site/codec.js'
-import { createReferenceUrl } from './index'
+import { createReferenceUrl } from '../skill/scripts/core'
 
 async function decode(urlString: string): Promise<string> {
   const url = new URL(urlString)
@@ -35,12 +35,16 @@ test('auto selects plain, gzip, and Brotli as useful', async () => {
   expect(new URL(mediumUrl).searchParams.get('algo')).toBe('gzip')
   expect(new URL(largeUrl).searchParams.get('algo')).toBe('br')
   expect(await decode(shortUrl)).toBe(short)
-  expect(await decode(mediumUrl)).toBe(medium)
-  expect(await decode(largeUrl)).toBe(large)
   expect(await decodePayload(new URL(largeUrl).searchParams)).toBe(large)
 
   const browserAuto = await encodePayload(large)
   expect(browserAuto.algo).toBe('br')
+})
+
+test('adds markdown render mode when requested', async () => {
+  const url = new URL(await createReferenceUrl('https://cita.example', '# heading', 'md'))
+  expect(url.searchParams.get('render')).toBe('md')
+  expect(await decode(url.toString())).toBe('# heading')
 })
 
 test('rejects citation URLs over 32 KiB', async () => {

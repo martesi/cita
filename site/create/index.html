@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <meta name="description" content="Create a compact Cita reference." />
+    <title>Create · Cita</title>
+    <link rel="icon" href="../icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <a class="brand" href="../"><span class="brand-icon" aria-hidden="true"></span>cita</a>
+        <span class="muted">create</span>
+      </header>
+
+      <section class="panel editor">
+        <textarea id="input" aria-label="Reference content" placeholder="Paste the content to encode…"></textarea>
+        <div class="editor-actions">
+          <label>
+            <span class="muted">Encoding</span>
+            <select id="algo">
+              <option value="auto" selected>Auto</option>
+              <option value="plain">Plain URL</option>
+              <option value="gzip">Gzip</option>
+              <option value="br">Brotli</option>
+            </select>
+          </label>
+          <label>
+            <span class="muted">Render</span>
+            <select id="render">
+              <option value="" selected>Text</option>
+              <option value="md">Markdown</option>
+            </select>
+          </label>
+          <button class="primary" id="generate" type="button">Generate citation</button>
+        </div>
+        <span class="muted">⌘/Ctrl + Enter to generate</span>
+      </section>
+
+      <p id="status" role="status" aria-live="polite"></p>
+    </main>
+    <script type="module" src="./create.js"></script>
+  </body>
+</html>

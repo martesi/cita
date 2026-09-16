@@ -4,12 +4,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "vite build",
+    "build": "rm -rf dist && vite build && bun build src/index.ts --outdir dist/server --target=bun",
     "check": "bun test && tsc --noEmit && bun run build"
   },
   "dependencies": {
     "@modelcontextprotocol/server": "2.0.0",
     "brotli-wasm": "3.0.1",
+    "markdown-it": "^15.0.2",
     "zod": "latest"
   },
   "devDependencies": {
