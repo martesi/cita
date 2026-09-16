@@ -16,6 +16,9 @@ export default {
   environments: {
     server: {
       consumer: 'server',
+      resolve: {
+        noExternal: true
+      },
       build: {
         target: 'node22',
         copyPublicDir: false,
