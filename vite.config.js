@@ -13,4 +13,19 @@ export default {
       },
     },
   },
+  environments: {
+    server: {
+      consumer: 'server',
+      build: {
+        target: 'node22',
+        copyPublicDir: false,
+        outDir: '../dist/server',
+        emptyOutDir: false,
+        rollupOptions: {
+          input: resolve('src/index.ts'),
+        },
+      },
+    },
+  },
+  builder: {},
 }

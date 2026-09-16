@@ -3,19 +3,21 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --host 0.0.0.0",
-    "build": "rm -rf dist && vite build && bun build src/index.ts --outdir dist/server --target=bun",
-    "check": "bun test && tsc --noEmit && bun run build"
+    "dev": "vite",
+    "build": "vite build",
+    "check": "bun run --parallel test typecheck build",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@modelcontextprotocol/server": "2.0.0",
-    "brotli-wasm": "3.0.1",
+    "@modelcontextprotocol/server": "^2.0.0",
+    "brotli-wasm": "^3.0.1",
     "markdown-it": "^15.0.2",
-    "zod": "latest"
+    "zod": "^4.5.4"
   },
   "devDependencies": {
     "@types/node": "^26.5.0",
-    "typescript": "latest",
-    "vite": "latest"
+    "typescript": "^7.0.2",
+    "vite": "^8.2.2"
   }
 }
