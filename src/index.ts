@@ -1,2 +1,2 @@
-export { handler as default } from '../skill/scripts/mcp'
+export { handler as default } from './mcp'
 export { createReferenceUrl } from '../skill/scripts/core'

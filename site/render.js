@@ -1,4 +1,5 @@
 import { decodePayload, utf8ByteLength } from './codec.js'
+import { version } from '../package.json' with { type: 'json' }
 
 const params = new URLSearchParams(location.search)
 const reader = document.querySelector('#reader')
@@ -22,7 +23,7 @@ async function init() {
   currentText = await decodePayload(params)
   await renderContent(currentText, params.get('render'))
   reader.hidden = false
-  meta.textContent = `${formatBytes(utf8ByteLength(currentText))} · ${params.get('algo') || 'plain'}`
+  meta.textContent = `v${version} · ${formatBytes(utf8ByteLength(currentText))} · ${params.get('algo') || 'plain'}`
 }
 
 async function renderContent(text, mode) {

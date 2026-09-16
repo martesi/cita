@@ -4,6 +4,10 @@ Compact, self-contained references for LLM answers.
 
 Cita keeps referenced text inside the URL itself. Nothing is stored in a database or object store.
 
+Deployments:
+- `https://martesi.github.io/cita/` — static GitHub Pages deployment; transparent and reproducible from the repository.
+- `https://cita.martes.dev` — ChatGPT-hosted deployment; manually deployed and platform-controlled. Its usable MCP endpoint is `/api/mcp` because ChatGPT Sites does not currently permit `/mcp`.
+
 ## Pages
 
 `/` only renders content from the URL. `/create/` creates Cita URLs.
@@ -17,11 +21,9 @@ Rendering defaults to literal text. Add `render=md` to render Markdown; embedded
 /?q=<content>&render=md
 ```
 
-GitHub Pages keeps the same static renderer and creator. Query-dependent decoding and Markdown rendering happen in the browser.
-
 ## MCP
 
-The hosted backend exposes `/mcp` and `/api/mcp` and provides:
+When deployed on a normal host, the backend exposes both `/mcp` and `/api/mcp`. The duplicate `/api/mcp` path exists for ChatGPT Sites, which does not currently permit clients to use `/mcp`; on that deployment, clients should use `/api/mcp`.
 
 ```text
 create_reference(urls, base?, render?) -> results[]
@@ -33,12 +35,11 @@ The tool compares plain URL encoding and gzip, then considers Brotli for larger 
 
 ## Skill and local CLI
 
-Reusable encoding and MCP logic lives under `skill/`. The hosted MCP imports the same implementation used by the local CLI.
+Reusable encoding logic lives under `skill/`. The hosted MCP imports the same core implementation used by the local CLI.
 
 ```sh
-bun skill/scripts/cli.ts encode 'content'
-bun skill/scripts/cli.ts encode '# heading' --render md
-bun skill/scripts/cli.ts mcp
+node --experimental-strip-types skill/scripts/cli.ts encode 'content'
+node --experimental-strip-types skill/scripts/cli.ts encode '# heading' --render md
 ```
 
 `encode` also accepts content on stdin. `--base` or `CITA_BASE_URL` controls the target deployment.
@@ -53,4 +54,4 @@ bun run check
 
 `bun run build` emits the static frontend under `dist/client` and the bundled MCP server entry under `dist/server`.
 
-Because payloads live in query strings, they can appear in browser history, proxy/CDN request metadata, or server access logs. Cita removes persistent application storage; it is not encryption.
+Because payloads live in query strings, they can appear in browser history, proxy/CDN request metadata, or server access logs.

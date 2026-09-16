@@ -10,7 +10,7 @@ For URL references:
 - Static GitHub Pages deployments decode the payload in JavaScript because a static host cannot render query-dependent HTML.
 
 For LLM clients:
-- Use the MCP endpoint at /mcp or /api/mcp when available.
+- Use /api/mcp on the ChatGPT Sites deployment. /mcp may be exposed by the implementation, but ChatGPT Sites does not currently permit clients to use it.
 - Call create_reference with a `urls` array and an optional `base` URL.
 - The response contains a `results` array; each item has either `url` or `reason`.
 - `base` defaults to the build-time `CITA_BASE_URL` value.

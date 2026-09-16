@@ -1,13 +1,14 @@
 import { createMcpHandler, McpServer } from '@modelcontextprotocol/server'
 import { z } from 'zod'
-import { createReferenceUrl, type RenderMode } from './core'
+import { version } from '../package.json' with { type: 'json' }
+import { createReferenceUrl, type RenderMode } from '../skill/scripts/core'
 
 export const handler = createMcpHandler(({ requestInfo }) =>
   createCitaServer(requestInfo ? new URL(requestInfo.url).origin : ''),
 )
 
 export function createCitaServer(origin = ''): McpServer {
-  const server = new McpServer({ name: 'cita', version: '0.3.0' })
+  const server = new McpServer({ name: 'cita', version })
   const defaultBase = process.env.CITA_BASE_URL || origin
 
   server.registerTool(

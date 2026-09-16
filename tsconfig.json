@@ -4,10 +4,11 @@
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "Preserve",
     "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
     "strict": true,
     "skipLibCheck": true,
     "noEmit": true,
     "types": ["node"]
   },
-  "include": ["src/index.ts", "skill/scripts/core.ts", "skill/scripts/mcp.ts"]
+  "include": ["src/index.ts", "skill/scripts/cli.ts", "skill/scripts/core.ts"]
 }
