@@ -26,10 +26,12 @@ Rendering defaults to literal text. Add `render=md` to render Markdown; embedded
 When deployed on a normal host, the backend exposes both `/mcp` and `/api/mcp`. The duplicate `/api/mcp` path exists for ChatGPT Sites, which does not currently permit clients to use `/mcp`; on that deployment, clients should use `/api/mcp`.
 
 ```text
-create_reference(urls, base?, render?) -> results[]
+create_reference(contents, base?, render?) -> results[]
 ```
 
 Each result contains either `url` or `reason`. `base` overrides `CITA_BASE_URL`; hosted requests fall back to their request origin. `render: "md"` applies `render=md` to every generated URL.
+
+The MCP accepts source content, not bare source URLs. URL-only content is refused so clients fetch the source text before creating a citation.
 
 The tool compares plain URL encoding and gzip, then considers Brotli for larger payloads and returns the shortest result. Generated URLs remain self-contained.
 
