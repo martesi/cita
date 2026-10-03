@@ -1,11 +1,11 @@
 ---
 name: cita
-description: Create compact, self-contained Cita reference URLs from text or source URLs, optionally rendered as Markdown. Prefer an available Cita MCP create_reference tool from the current tool context; otherwise fall back to the bundled local encoder CLI.
+description: Create compact, self-contained Cita reference URLs from source content, optionally rendered as Markdown. Prefer an available Cita MCP create_reference tool from the current tool context; otherwise fall back to the bundled local encoder CLI.
 ---
 
 # Cita
 
-Prefer an already-exposed Cita MCP tool when the current tool context provides one. Use its `create_reference` operation directly.
+Prefer an already-exposed Cita MCP tool when the current tool context provides one. Use its `create_reference` operation directly with source content. Do not send a bare URL as content; fetch the source text first.
 
 If no Cita MCP tool is available, run the bundled CLI:
 
