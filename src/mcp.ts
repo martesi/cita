@@ -15,9 +15,9 @@ export function createCitaServer(origin = ''): McpServer {
     'create_reference',
     {
       description:
-        'Convert source URLs into self-contained Cita citation URLs. Each result contains either a citation URL or a reason when that source cannot be converted.',
+        'Convert source content into self-contained Cita citation URLs. Content that only contains a URL is refused; fetch the source text first.',
       inputSchema: z.object({
-        urls: z.array(z.string()).min(1).describe('Source URLs to convert.'),
+        contents: z.array(z.string()).min(1).describe('Source content to convert.'),
         base: z
           .string()
           .url()
@@ -37,21 +37,24 @@ export function createCitaServer(origin = ''): McpServer {
         ),
       }),
     },
-    async ({ urls, base, render }) => {
+    async ({ contents, base, render }) => {
       const result = {
         results: await Promise.all(
-          urls.map(async (source) => {
+          contents.map(async (content) => {
+            if (isUrlOnly(content)) {
+              return { reason: 'Content must include source text, not only a URL' }
+            }
+
             try {
-              const sourceUrl = new URL(source)
               return {
                 url: await createReferenceUrl(
                   base || defaultBase,
-                  sourceUrl.toString(),
+                  content,
                   render as RenderMode | undefined,
                 ),
               }
             } catch (error) {
-              return { reason: error instanceof Error ? error.message : 'Invalid URL' }
+              return { reason: error instanceof Error ? error.message : 'Invalid content' }
             }
           }),
         ),
@@ -65,4 +68,13 @@ export function createCitaServer(origin = ''): McpServer {
   )
 
   return server
+}
+
+function isUrlOnly(content: string): boolean {
+  try {
+    new URL(content.trim())
+    return true
+  } catch {
+    return false
+  }
 }
