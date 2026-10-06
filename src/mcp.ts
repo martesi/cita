@@ -41,6 +41,9 @@ export function createCitaServer(origin = ''): McpServer {
       const result = {
         results: await Promise.all(
           contents.map(async (content) => {
+            if (!content.trim()) {
+              return { reason: 'Content must include source text' }
+            }
             if (isUrlOnly(content)) {
               return { reason: 'Content must include source text, not only a URL' }
             }
@@ -71,8 +74,11 @@ export function createCitaServer(origin = ''): McpServer {
 }
 
 function isUrlOnly(content: string): boolean {
+  const value = content.trim()
+  // URL parsing accepts spaces in custom schemes and removes tabs/newlines.
+  if (/\s/u.test(value)) return false
   try {
-    new URL(content.trim())
+    new URL(value)
     return true
   } catch {
     return false

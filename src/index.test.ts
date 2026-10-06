@@ -2,6 +2,28 @@ import { expect, test } from 'bun:test'
 import { brotliDecompressSync } from 'node:zlib'
 import { decodePayload, encodePayload } from '../site/codec.js'
 import { createReferenceUrl } from '../skill/scripts/core'
+import { handler } from './mcp'
+
+async function callMcp(contents: string[]) {
+  const response = await handler.fetch(new Request('https://cita.example/api/mcp', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      accept: 'application/json, text/event-stream',
+      'mcp-protocol-version': '2025-06-18',
+    },
+    body: JSON.stringify({
+      jsonrpc: '2.0', id: 1, method: 'tools/call',
+      params: { name: 'create_reference', arguments: { contents } },
+    }),
+  }))
+  expect(response.status).toBe(200)
+  const message = (await response.text()).split('\n').find((line) => line.startsWith('data: '))
+  if (!message) throw new Error('Missing MCP response')
+  const result = JSON.parse(message.slice(6)).result
+  expect(result.isError).not.toBe(true)
+  return result.structuredContent.results
+}
 
 async function decode(urlString: string): Promise<string> {
   const url = new URL(urlString)
@@ -53,4 +75,36 @@ test('rejects citation URLs over 32 KiB', async () => {
   await expect(createReferenceUrl(oversizedBase, 'x')).rejects.toThrow(
     'Citation URL exceeds 32768 bytes',
   )
+})
+
+test('MCP preserves source prose containing colons, URLs, and whitespace', async () => {
+  const contents = [
+    'Source: This paragraph contains source text.',
+    'https://example.com/\nThis is a source excerpt.',
+    'https://example.com/ This is a source excerpt.',
+    '  Source text with Unicode: 你好世界\t\n',
+  ]
+  const results = await callMcp(contents)
+  expect(results).toHaveLength(contents.length)
+  for (const [index, result] of results.entries()) {
+    expect(await decode(result.url)).toBe(contents[index])
+  }
+})
+
+test('MCP still refuses standalone URLs', async () => {
+  const contents = [
+    'https://example.com/',
+    ' \nhttps://example.com/a%20b\t ',
+    'http://example.com/?q=source#text',
+    'mailto:reader@example.com',
+  ]
+  expect(await callMcp(contents)).toEqual(contents.map(() => ({
+    reason: 'Content must include source text, not only a URL',
+  })))
+})
+
+test('MCP rejects blank items without blocking valid source content', async () => {
+  const results = await callMcp(['', ' \t\n', '\u00a0', 'Source text.'])
+  expect(results.slice(0, 3)).toEqual(Array(3).fill({ reason: 'Content must include source text' }))
+  expect(await decode(results[3].url)).toBe('Source text.')
 })
